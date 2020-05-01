@@ -1,0 +1,16 @@
+FROM balenalib/raspberrypi4-64-debian-python:stretch AS kernelbuilder
+
+RUN apt-get update \
+    && apt-get install -y curl wget build-essential libelf-dev awscli bc flex libssl-dev python bison
+
+COPY . /usr/src/app
+WORKDIR /usr/src/app
+
+RUN chmod +x build.sh
+RUN chmod +x workarounds.sh
+RUN chmod +x run.sh
+
+ENV VERSION '2.48.0+rev1.dev'
+RUN ./build.sh %%BALENA_MACHINE_NAME%% $VERSION example_module
+
+CMD ./run.sh
