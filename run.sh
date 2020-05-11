@@ -6,9 +6,10 @@ echo "OS Version is $OS_VERSION"
 modprobe i2c-dev
 
 mod_dir="seeed-voicecard_${BALENA_DEVICE_TYPE}_${OS_VERSION}*"
+echo "Loading snd-soc-simple-card first..."
+modprobe snd-soc-simple-card
 for each in $mod_dir; do
 	echo Loading module from "$each"
-	cp "$each/snd-soc-ac108.ko"
 	insmod "$each/snd-soc-ac108.ko"
 	insmod "$each/snd-soc-wm8960.ko"
 	insmod "$each/snd-soc-seeed-voicecard.ko"
