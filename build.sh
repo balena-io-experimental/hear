@@ -172,13 +172,3 @@ for path in $(get_header_paths "$device" "$version"); do
 done
 
 [[ -n "$seen" ]] || fatal "Could not find headers for '$device' at version '$version', run $0 --list"
-
-#install config files
-mkdir /etc/voicecard || true
-cp ./seeed-voicecard/*.conf /etc/voicecard
-cp ./seeed-voicecard/*.state /etc/voicecard
-
-cp ./seeed-voicecard/seeed-voicecard /usr/bin/
-cp ./seeed-voicecard/seeed-voicecard.service /lib/systemd/system/
-#systemctl enable  seeed-voicecard.service
-#systemctl start   seeed-voicecard

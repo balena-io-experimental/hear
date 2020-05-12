@@ -30,7 +30,7 @@ endif
 else
 
 KERNEL_TREE_PATH?=/lib/modules/$(uname_r)/build
-DEST := /lib/modules/$(shell uname_r)/kernel
+DEST := /lib/modules/$(uname_r)/kernel
 
 all: snd-soc-ac108.ko snd-soc-wm8960.ko snd-soc-seeed-voicecard.ko install
 
@@ -45,7 +45,6 @@ snd-soc-seeed-voicecard.ko: seeed-voicecard.c
 
 install:
 	sudo cp snd-soc-ac108.ko ${DEST}/sound/soc/codecs/
-	sudo cp snd-soc-wm8960.ko ${DEST}/sound/soc/codecs/
 	sudo cp snd-soc-seeed-voicecard.ko ${DEST}/sound/soc/bcm/
 	sudo depmod -a
 

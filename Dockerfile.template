@@ -5,11 +5,13 @@ RUN apt-get update \
     && apt-get install -y dkms git i2c-tools libasound2-plugins
 
 COPY . /usr/src/app
+# Copy configuration and service files
+RUN mkdir /etc/voicecard
+COPY ./seeed-voicecard/*.conf /etc/voicecard/
+COPY ./seeed-voicecard/*.state /etc/voicecard/
+COPY ./seeed-voicecard/seeed-voicecard /usr/bin/
+COPY ./seeed-voicecard/seeed-voicecard.service /lib/systemd/system/
 WORKDIR /usr/src/app
-
-RUN chmod +x build.sh
-RUN chmod +x workarounds.sh
-RUN chmod +x run.sh
 
 ENV VERSION '2.48.0+rev1.dev'
 RUN ./build.sh %%BALENA_MACHINE_NAME%% $VERSION seeed-voicecard

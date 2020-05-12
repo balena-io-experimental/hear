@@ -41,40 +41,53 @@ This project has been the starting point to build the kernel module: https://git
 Modifed the Dockerfile, build.sh and run.sh with the relevant parts from [seeed-voicecard repo](https://github.com/respeaker/seeed-voicecard).
 
 Slightly modified [Makefile](./seeed-voicecard/Makefile).
-Copy pasted parts of [install.sh](./seeed-voicecard/install.sh)
+Copy pasted parts of [install.sh](./seeed-voicecard/install.sh) to Dockerfile.
 
 ## Current state
 
 Seeing errors
 ```
-08.05.20 15:27:49 (+0300)  main  OS Version is 2.48.0+rev1
-08.05.20 15:27:49 (+0300)  main  Loading module from seeed-voicecard_raspberrypi4-64_2.48.0+rev1.dev
-08.05.20 15:27:49 (+0300)  main  insmod: ERROR: could not insert module seeed-voicecard_raspberrypi4-64_2.48.0+rev1.dev/snd-soc-ac108.ko: Unknown symbol in module
-08.05.20 15:27:49 (+0300)  main  insmod: ERROR: could not insert module seeed-voicecard_raspberrypi4-64_2.48.0+rev1.dev/snd-soc-wm8960.ko: File exists
-08.05.20 15:27:49 (+0300)  main  insmod: ERROR: could not insert module seeed-voicecard_raspberrypi4-64_2.48.0+rev1.dev/snd-soc-seeed-voicecard.ko: Unknown symbol in module
-08.05.20 15:27:49 (+0300)  main  rmmod: ERROR: Module snd_soc_seeed_voicecard is not currently loaded
+12.05.20 13:12:14 (+0300)  main  OS Version is 2.48.0+rev1
+12.05.20 13:12:14 (+0300)  main  Loading snd-soc-simple-card first...
+12.05.20 13:12:14 (+0300)  main  Loading module from seeed-voicecard_raspberrypi4-64_2.48.0+rev1
+12.05.20 13:12:14 (+0300)  main  insmod: ERROR: could not load module seeed-voicecard_raspberrypi4-64_2.48.0+rev1/snd-soc-ac108.ko: No such file or directory
+12.05.20 13:12:14 (+0300)  main  insmod: ERROR: could not load module seeed-voicecard_raspberrypi4-64_2.48.0+rev1/snd-soc-seeed-voicecard.ko: No such file or directory
 ```
 
-`dmesg` shows:
+
+Although `lsmod | grep snd` shows:
 ```
-[  459.210650] snd_soc_ac108: Unknown symbol seeed_voice_card_register_set_clock (err -2)
-[  459.239411] snd_soc_seeed_voicecard: Unknown symbol asoc_simple_card_parse_dai (err -2)
-[  459.247681] snd_soc_seeed_voicecard: Unknown symbol asoc_simple_card_parse_card_name (err -2)
-[  459.256454] snd_soc_seeed_voicecard: Unknown symbol asoc_simple_card_parse_daifmt (err -2)
-[  459.264949] snd_soc_seeed_voicecard: Unknown symbol asoc_simple_card_parse_clk (err -2)
-[  459.273355] snd_soc_seeed_voicecard: Unknown symbol asoc_simple_card_init_dai (err -2)
-[  459.281641] snd_soc_seeed_voicecard: Unknown symbol asoc_simple_card_set_dailink_name (err -2)
-[  459.291055] snd_soc_seeed_voicecard: Unknown symbol asoc_simple_card_clean_reference (err -2)
-[  459.299957] snd_soc_seeed_voicecard: Unknown symbol asoc_simple_card_canonicalize_cpu (err -2)
-[  459.308869] snd_soc_seeed_voicecard: Unknown symbol asoc_simple_card_canonicalize_dailink (err -2)
-[  459.356697] snd_soc_ac108: Unknown symbol seeed_voice_card_register_set_clock (err -2)
-[  459.388911] snd_soc_seeed_voicecard: Unknown symbol asoc_simple_card_parse_dai (err -2)
-[  459.397311] snd_soc_seeed_voicecard: Unknown symbol asoc_simple_card_parse_card_name (err -2)
-[  459.406362] snd_soc_seeed_voicecard: Unknown symbol asoc_simple_card_parse_daifmt (err -2)
-[  459.415138] snd_soc_seeed_voicecard: Unknown symbol asoc_simple_card_parse_clk (err -2)
-[  459.423513] snd_soc_seeed_voicecard: Unknown symbol asoc_simple_card_init_dai (err -2)
-[  459.431662] snd_soc_seeed_voicecard: Unknown symbol asoc_simple_card_set_dailink_name (err -2)
-[  459.440557] snd_soc_seeed_voicecard: Unknown symbol asoc_simple_card_clean_reference (err -2)
-[  459.449329] snd_soc_seeed_voicecard: Unknown symbol asoc_simple_card_canonicalize_cpu (err -2)
-[  459.458947] snd_soc_seeed_voicecard: Unknown symbol asoc_simple_card_canonicalize_dailink (err -2)
+12.05.20 13:12:14 (+0300)  main  snd_soc_ac108          65536  0
+12.05.20 13:12:14 (+0300)  main  snd_soc_seeed_voicecard    16384  1 snd_soc_ac108
+12.05.20 13:12:14 (+0300)  main  snd_soc_wm8960         49152  0
+12.05.20 13:12:14 (+0300)  main  snd_soc_simple_card    16384  0
+12.05.20 13:12:14 (+0300)  main  snd_soc_simple_card_utils    16384  2 snd_soc_seeed_voicecard,snd_soc_simple_card
+12.05.20 13:12:14 (+0300)  main  snd_soc_bcm2835_i2s    20480  0
+12.05.20 13:12:14 (+0300)  main  regmap_mmio            16384  1 snd_soc_bcm2835_i2s
+12.05.20 13:12:14 (+0300)  main  snd_bcm2835            28672  0
+12.05.20 13:12:14 (+0300)  main  snd_soc_core          217088  7 snd_soc_seeed_voicecard,snd_soc_bcm2835_i2s,vc4,snd_soc_ac108,snd_soc_simple_card_utils,snd_soc_simple_card,snd_soc_wm8960
+12.05.20 13:12:14 (+0300)  main  snd_compress           20480  1 snd_soc_core
+12.05.20 13:12:14 (+0300)  main  snd_pcm_dmaengine      16384  1 snd_soc_core
+12.05.20 13:12:14 (+0300)  main  snd_pcm               126976  6 snd_soc_bcm2835_i2s,vc4,snd_bcm2835,snd_soc_core,snd_soc_wm8960,snd_pcm_dmaengine
+12.05.20 13:12:14 (+0300)  main  snd_timer              40960  1 snd_pcm
+12.05.20 13:12:14 (+0300)  main  snd                    86016  6 snd_bcm2835,snd_timer,snd_compress,snd_soc_core,snd_pcm,snd_soc_wm8960
+```
+
+Test command provided in seeed-voicecard repo does not work
+```shell
+$ arecord -L
+bash: arecord: command not found
+```
+I couldn't get `seeed-voicecard.service` running
+```shell
+$ systemctl status seeed-voicecard.service
+Unit seeed-voicecard.service could not be found.
+$ systemctl enable seeed-voicecard.service
+Failed to enable unit: Unit file seeed-voicecard.service does not exist.
+```
+
+Furthermore I don't see the codecs copied (`snd-soc-ac108.ko` and `snd-soc-seeed-voicecard.ko`) as part of `install` in [Makefile](./seeed-voicecard/Makefile):
+```
+$ ls /lib/modules/4.19.75/kernel/sound/soc/codecs/
+$ ls /lib/modules/4.19.75/kernel/sound/soc/bcm/
 ```
