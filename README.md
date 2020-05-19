@@ -45,39 +45,48 @@ Copy pasted parts of [install.sh](./seeed-voicecard/install.sh) to Dockerfile.
 
 ## Current state
 
-Seeing errors
+On first boot, I see the error `insmod: ERROR: could not insert module seeed-voicecard_raspberrypi4-64_2.48.0+rev1.dev/snd-soc-ac108.ko: Unknown symbol in module`.
+
+`dmesg` shows:
 ```
-12.05.20 13:12:14 (+0300)  main  OS Version is 2.48.0+rev1
-12.05.20 13:12:14 (+0300)  main  Loading snd-soc-simple-card first...
-12.05.20 13:12:14 (+0300)  main  Loading module from seeed-voicecard_raspberrypi4-64_2.48.0+rev1
-12.05.20 13:12:14 (+0300)  main  insmod: ERROR: could not load module seeed-voicecard_raspberrypi4-64_2.48.0+rev1/snd-soc-ac108.ko: No such file or directory
-12.05.20 13:12:14 (+0300)  main  insmod: ERROR: could not load module seeed-voicecard_raspberrypi4-64_2.48.0+rev1/snd-soc-seeed-voicecard.ko: No such file or directory
+[   15.460062] snd_soc_ac108: loading out-of-tree module taints kernel.
+[   15.467865] snd_soc_ac108: Unknown symbol seeed_voice_card_register_set_clock (err -2)
+```
+Then after restarting the services, these errors are gone. Now we get the following errors about files existing. Seems like `snd-soc-ac108.ko` is installed fine as there are no `dmesg` errors seen.
+```
+19.05.20 18:45:46 (+0300)  main  OS Version is 2.48.0+rev1
+19.05.20 18:45:46 (+0300)  main  Loading snd-soc-simple-card first...
+19.05.20 18:45:46 (+0300)  main  Loading modules from seeed-voicecard_raspberrypi4-64_2.48.0+rev1.dev
+19.05.20 18:45:46 (+0300)  main  insmod: ERROR: could not insert module seeed-voicecard_raspberrypi4-64_2.48.0+rev1.dev/snd-soc-seeed-voicecard.ko: File exists
+19.05.20 18:45:46 (+0300)  main  insmod: ERROR: could not insert module seeed-voicecard_raspberrypi4-64_2.48.0+rev1.dev/snd-soc-wm8960.ko: File exists
 ```
 
-
-Although `lsmod | grep snd` shows:
+`lsmod | grep snd` shows the modules loaded fine:
 ```
-12.05.20 13:12:14 (+0300)  main  snd_soc_ac108          65536  0
-12.05.20 13:12:14 (+0300)  main  snd_soc_seeed_voicecard    16384  1 snd_soc_ac108
-12.05.20 13:12:14 (+0300)  main  snd_soc_wm8960         49152  0
-12.05.20 13:12:14 (+0300)  main  snd_soc_simple_card    16384  0
-12.05.20 13:12:14 (+0300)  main  snd_soc_simple_card_utils    16384  2 snd_soc_seeed_voicecard,snd_soc_simple_card
-12.05.20 13:12:14 (+0300)  main  snd_soc_bcm2835_i2s    20480  0
-12.05.20 13:12:14 (+0300)  main  regmap_mmio            16384  1 snd_soc_bcm2835_i2s
-12.05.20 13:12:14 (+0300)  main  snd_bcm2835            28672  0
-12.05.20 13:12:14 (+0300)  main  snd_soc_core          217088  7 snd_soc_seeed_voicecard,snd_soc_bcm2835_i2s,vc4,snd_soc_ac108,snd_soc_simple_card_utils,snd_soc_simple_card,snd_soc_wm8960
-12.05.20 13:12:14 (+0300)  main  snd_compress           20480  1 snd_soc_core
-12.05.20 13:12:14 (+0300)  main  snd_pcm_dmaengine      16384  1 snd_soc_core
-12.05.20 13:12:14 (+0300)  main  snd_pcm               126976  6 snd_soc_bcm2835_i2s,vc4,snd_bcm2835,snd_soc_core,snd_soc_wm8960,snd_pcm_dmaengine
-12.05.20 13:12:14 (+0300)  main  snd_timer              40960  1 snd_pcm
-12.05.20 13:12:14 (+0300)  main  snd                    86016  6 snd_bcm2835,snd_timer,snd_compress,snd_soc_core,snd_pcm,snd_soc_wm8960
+snd_soc_ac108          69632  0
+snd_soc_wm8960         49152  0
+snd_soc_seeed_voicecard    16384  1 snd_soc_ac108
+snd_soc_simple_card    16384  0
+snd_soc_simple_card_utils    16384  2 snd_soc_seeed_voicecard,snd_soc_simple_card
+snd_soc_bcm2835_i2s    20480  0
+regmap_mmio            16384  1 snd_soc_bcm2835_i2s
+snd_soc_core          217088  7 snd_soc_seeed_voicecard,snd_soc_bcm2835_i2s,vc4,snd_soc_ac108,snd_soc_simple_card_utils,snd_soc_simple_card,snd_soc_wm8960
+snd_compress           20480  1 snd_soc_core
+snd_bcm2835            28672  0
+snd_pcm_dmaengine      16384  1 snd_soc_core
+snd_pcm               126976  6 snd_soc_bcm2835_i2s,vc4,snd_bcm2835,snd_soc_core,snd_soc_wm8960,snd_pcm_dmaengine
+snd_timer              40960  1 snd_pcm
+snd                    86016  6 snd_bcm2835,snd_timer,snd_compress,snd_soc_core,snd_pcm,snd_soc_wm8960
 ```
 
-Test command provided in seeed-voicecard repo does not work
+But the test command provided in seeed-voicecard repo does not work. `arecord -l` doesn't list any capturing hardware device.
 ```shell
-$ arecord -L
-bash: arecord: command not found
+$ arecord --list-devices
+**** List of CAPTURE Hardware Devices ****
 ```
+
+So at the end the hardware is still not recognized for some reason.
+
 I couldn't get `seeed-voicecard.service` running
 ```shell
 $ systemctl status seeed-voicecard.service

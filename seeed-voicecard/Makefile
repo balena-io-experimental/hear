@@ -45,6 +45,7 @@ snd-soc-seeed-voicecard.ko: seeed-voicecard.c
 
 install:
 	sudo cp snd-soc-ac108.ko ${DEST}/sound/soc/codecs/
+	sudo cp snd-soc-wm8960.ko ${DEST}/sound/soc/codecs/
 	sudo cp snd-soc-seeed-voicecard.ko ${DEST}/sound/soc/bcm/
 	sudo depmod -a
 
